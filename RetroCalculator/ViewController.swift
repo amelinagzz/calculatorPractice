@@ -11,34 +11,18 @@ import AVFoundation
 
 class ViewController: UIViewController {
 
-    enum Operation : String {
-        case Divide
-        case Multiply
-        case Subtract
-        case Add
-        case Empty
-        case Clear
-    }
-    
     @IBOutlet weak var outputlbl : UILabel!
-    var btnSound: AVAudioPlayer!
     var runningNumber = ""
     var leftValStr = ""
     var rightValStr = ""
-    var currentOperation: Operation = Operation.Empty
+    var currentOperation = CalcService.Operation.Empty
     var result = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let path = NSBundle.mainBundle().pathForResource("btn", ofType: "wav")
-        let soundUrl = NSURL(fileURLWithPath: path!)
         
-        do{
-            try btnSound = AVAudioPlayer(contentsOfURL: soundUrl)
-            btnSound.prepareToPlay()
-        } catch let err as NSError{
-            print(err.debugDescription)
-        }
+        AudioService.instance.soundFXPlayer = AudioService.instance.createPlayerWithUrl(AudioService.instance.btnUrl!)
+        AudioService.instance.soundFXPlayer?.prepareToPlay()
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -59,19 +43,19 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onDividePressed(sender: AnyObject) {
-        processOperation(Operation.Divide)
+        processOperation(CalcService.Operation.Divide)
     }
     
     @IBAction func onMultiplyPressed(sender: AnyObject) {
-        processOperation(Operation.Multiply)
+        processOperation(CalcService.Operation.Multiply)
     }
     
     @IBAction func onSubtractPressed(sender: AnyObject) {
-        processOperation(Operation.Subtract)
+        processOperation(CalcService.Operation.Subtract)
     }
     
     @IBAction func onAddPressed(sender: AnyObject) {
-        processOperation(Operation.Add)
+        processOperation(CalcService.Operation.Add)
     }
     
     @IBAction func onEqualPressed(sender: AnyObject) {
@@ -81,29 +65,29 @@ class ViewController: UIViewController {
     @IBAction func onClearPressed(sender: AnyObject) {
         leftValStr = ""
         rightValStr = ""
-        currentOperation = Operation.Empty
+        currentOperation = CalcService.Operation.Empty
         result = ""
         runningNumber = ""
         outputlbl.text = result
         
     }
-    func processOperation(op: Operation){
+    func processOperation(op: CalcService.Operation){
         playSound()
-        if(currentOperation != Operation.Empty && leftValStr != ""){
+        if(currentOperation != CalcService.Operation.Empty && leftValStr != ""){
             //Run some math
             //A user selected an operator, but then selected another operator without first entering a number
             if(runningNumber != ""){
                 rightValStr = runningNumber
                 runningNumber = ""
                 
-                if(currentOperation == Operation.Multiply){
-                    result = "\(Double(leftValStr)! * Double(rightValStr)!)"
-                }else if (currentOperation == Operation.Divide){
-                    result = "\(Double(leftValStr)! / Double(rightValStr)!)"
-                }else if (currentOperation == Operation.Subtract){
-                    result = "\(Double(leftValStr)! - Double(rightValStr)!)"
-                }else if (currentOperation == Operation.Add){
-                    result = "\(Double(leftValStr)! + Double(rightValStr)!)"
+                if(currentOperation == CalcService.Operation.Multiply){
+                    result = CalcService.instance.multiply(leftValStr, numStrB: rightValStr)!
+                }else if (currentOperation == CalcService.Operation.Divide){
+                    result = CalcService.instance.divide(leftValStr, numStrB: rightValStr)!
+                }else if (currentOperation == CalcService.Operation.Subtract){
+                    result = CalcService.instance.subtract(leftValStr, numStrB: rightValStr)!
+                }else if (currentOperation == CalcService.Operation.Add){
+                    result = CalcService.instance.add(leftValStr, numStrB: rightValStr)!
                 }
                 
                 leftValStr = result
@@ -122,10 +106,7 @@ class ViewController: UIViewController {
     }
     
     func playSound(){
-        if(btnSound.playing){
-            btnSound.stop()
-        }
-        btnSound.play()
+        AudioService.instance.playCurrentSoundFX()
     }
 
 }

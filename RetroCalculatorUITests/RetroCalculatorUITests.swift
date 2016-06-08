@@ -28,8 +28,35 @@ class RetroCalculatorUITests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
+    func testCalc() {
         // Use recording to get started writing UI tests.
+        
+        let app = XCUIApplication()
+        let button = app.buttons["5"]
+        button.tap()
+        app.buttons["add"].tap()
+        button.tap()
+        
+        let equalButton = app.buttons["equal"]
+        equalButton.tap()
+        
+        XCTAssertTrue(app.staticTexts["10.0"].exists)
+        
+        app.buttons["divide"].tap()
+        app.buttons["2"].tap()
+        equalButton.tap()
+        XCTAssertTrue(app.staticTexts["5.0"].exists)
+
+        app.buttons["multiply"].tap()
+        button.tap()
+        equalButton.tap()
+        XCTAssertTrue(app.staticTexts["25.0"].exists)
+
+        app.buttons["subtract"].tap()
+        app.buttons["4"].tap()
+        equalButton.tap()
+        XCTAssertTrue(app.staticTexts["21.0"].exists)
+
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
